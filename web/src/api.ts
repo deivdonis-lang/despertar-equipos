@@ -1,5 +1,5 @@
 // Acceso a Supabase por RPC con fetch (sin dependencias).
-// En Lovable: pon VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY,
+// En GitHub Pages: variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY del repositorio,
 // o rellena las constantes de abajo.
 const URL_FIJA = "";
 const KEY_FIJA = "";

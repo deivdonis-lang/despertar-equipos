@@ -1,3 +1,4 @@
+# Web
 node_modules
 dist
 dist-ssr
@@ -6,5 +7,15 @@ dist-ssr
 .env.*
 !.env.example
 .vite
-.DS_Store
+# Android
+.gradle
+.kotlin
+build
+local.properties
+*.keystore
+*.jks
+*.apk
+# Windows
+windows/config.json
 *.log
+.DS_Store

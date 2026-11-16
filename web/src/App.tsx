@@ -22,7 +22,7 @@ function haceCuanto(iso: string): string {
 function Cabecera({ red, onSalir }: { red?: string; onSalir?: () => void }) {
   return (
     <header className="cabecera">
-      <img src="/icono.svg" alt="" className="icono" />
+      <img src={`${import.meta.env.BASE_URL}icono.svg`} alt="" className="icono" />
       <span className="version">{VERSION}</span>
       <h1>Despertar Equipos</h1>
       {red && (
@@ -183,7 +183,7 @@ function Panel({ clave, red, onSalir }: { clave: string; red: string; onSalir: (
         <ol className="pasos">
           <li>Descarga el agente y tu archivo de configuración:
             <div className="fila-botones">
-              <a className="boton" href="/agente/AgenteWOL.zip" download>Agente (zip)</a>
+              <a className="boton" href={`${import.meta.env.BASE_URL}agente/AgenteWOL.zip`} download>Agente (zip)</a>
               <button className="boton" onClick={descargarConfig}>config.json</button>
             </div>
           </li>
