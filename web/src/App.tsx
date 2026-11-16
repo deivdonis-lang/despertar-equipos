@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { rpc, Equipo, SUPABASE_URL, SUPABASE_KEY } from "./api";
 
-const VERSION = "v1.1";
+const VERSION = "v1.2";
 const CLAVE_LS = "wol_clave";
 
 function leerClave(): string {
@@ -195,7 +195,7 @@ function Panel({ clave, red, onSalir }: { clave: string; red: string; onSalir: (
           Para que el PC se pueda despertar hay que activar <b>Wake on LAN</b> en la BIOS/UEFI.
           El instalador activa la opción en Windows y desactiva el inicio rápido.
           Para despertar un equipo debe haber otro PC con el agente encendido en la misma red
-          (o el móvil con la app en la misma Wi-Fi).
+          (o un móvil con la app en <b>modo vigilante</b> en esa Wi-Fi: así no hace falta otro PC).
         </p>
       </section>
     </main>

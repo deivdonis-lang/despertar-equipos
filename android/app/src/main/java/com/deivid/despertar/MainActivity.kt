@@ -62,6 +62,7 @@ fun App() {
     val ctx = LocalContext.current
     var ajustes by remember { mutableStateOf(Ajustes.leer(ctx)) }
     var enAjustes by remember { mutableStateOf(!ajustes.completos) }
+    LaunchedEffect(Unit) { Servicios.aplicarTodos(ctx) }
 
     if (enAjustes) {
         BackHandler(enabled = ajustes.completos) { enAjustes = false }
@@ -152,13 +153,12 @@ fun Portada(ajustes: Ajustes, abrirAjustes: () -> Unit) {
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Cabecera(red)
+        PanelPermisos()
         if (error.isNotBlank()) Text(error, color = Paleta.Rojo, modifier = Modifier.padding(bottom = 8.dp))
         if (mensaje.isNotBlank()) Text(mensaje, color = Paleta.CianClaro, modifier = Modifier.padding(bottom = 8.dp))
 
         val lista = equipos
-        val encendidos = lista?.count { it.encendido } ?: 0
-        Marco(if (lista == null) "Equipos" else "Equipos ($encendidos de ${lista.size} encendidos)",
-            Modifier.weight(1f)) {
+        Marco("Equipos", Modifier.weight(1f)) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -310,11 +310,13 @@ fun PantallaAjustes(inicial: Ajustes, onGuardar: (Ajustes) -> Unit) {
             }
         }
         Spacer(Modifier.height(14.dp))
+        FichaServicios()
+        Spacer(Modifier.height(14.dp))
         Marco("Cómo funciona") {
             Text(
                 "Los PC con el agente instalado suben su IP y MAC a la web cada pocos segundos. " +
                 "Al pulsar Despertar, el móvil envía el paquete mágico por la Wi-Fi (si estás en la misma red) " +
-                "y además deja una orden para que cualquier PC encendido de esa red lo despierte.",
+                "y además deja una orden para que lo despierte cualquier PC encendido de esa red o un móvil con el modo vigilante en esa Wi-Fi.",
                 color = Paleta.Menta, fontSize = 14.sp,
             )
         }

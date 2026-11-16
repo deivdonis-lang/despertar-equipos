@@ -45,6 +45,11 @@ data class Equipo(
     val ordenEstado: String,
 )
 
+data class Orden(
+    val ordenId: String, val equipoId: String, val nombre: String,
+    val mac: String, val broadcast: String, val ipLocal: String,
+)
+
 class Api(private val a: Ajustes) {
 
     private suspend fun rpc(funcion: String, datos: JSONObject): String = withContext(Dispatchers.IO) {
@@ -85,6 +90,19 @@ class Api(private val a: Ajustes) {
         }
     }
 
+    suspend fun ordenesPendientes(): List<Orden> {
+        val arr = JSONArray(rpc("ordenes_pendientes", JSONObject().put("p_clave", a.clave)))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            fun s(k: String) = if (o.isNull(k)) "" else o.optString(k)
+            Orden(s("orden_id"), s("equipo_id"), s("nombre"), s("mac"), s("broadcast"), s("ip_local"))
+        }
+    }
+
+    suspend fun marcarEnviada(orden: String, quien: String) {
+        rpc("marcar_enviada", JSONObject().put("p_clave", a.clave).put("p_orden", orden).put("p_quien", quien))
+    }
+
     suspend fun pedirDespertar(e: Equipo) {
         rpc("pedir_despertar", JSONObject()
             .put("p_clave", a.clave).put("p_equipo", e.id).put("p_quien", "móvil"))
@@ -93,8 +111,10 @@ class Api(private val a: Ajustes) {
 
 object PaqueteMagico {
     /** Envía el paquete mágico por la red local (sirve si el móvil está en la misma Wi-Fi). */
-    suspend fun enviar(ctx: Context, e: Equipo): Boolean = withContext(Dispatchers.IO) {
-        val hex = e.mac.filter { it.isLetterOrDigit() }
+    suspend fun enviar(ctx: Context, e: Equipo): Boolean = enviar(ctx, e.mac, e.broadcast, e.ipLocal)
+
+    suspend fun enviar(ctx: Context, macTexto: String, broadcast: String, ipLocal: String): Boolean = withContext(Dispatchers.IO) {
+        val hex = macTexto.filter { it.isLetterOrDigit() }
         if (hex.length != 12) return@withContext false
         val mac = ByteArray(6) { hex.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
         val datos = ByteArray(102)
@@ -107,7 +127,7 @@ object PaqueteMagico {
         try {
             DatagramSocket().use { s ->
                 s.broadcast = true
-                for (destino in listOf(e.broadcast, "255.255.255.255", e.ipLocal).filter { it.isNotBlank() }.distinct()) {
+                for (destino in listOf(broadcast, "255.255.255.255", ipLocal).filter { it.isNotBlank() }.distinct()) {
                     for (puerto in listOf(9, 7)) {
                         runCatching {
                             s.send(DatagramPacket(datos, datos.size, InetAddress.getByName(destino), puerto))
